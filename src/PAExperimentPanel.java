@@ -109,10 +109,6 @@ public class PAExperimentPanel extends JPanel {
     public void paintComponent(Graphics g) {
         Graphics2D graphics2D = (Graphics2D) g;
         this.PaintTestArea(g); //绘画出测试区域
-        //如果要显示压力动态区域
-        /*if (ShowBack)
-            this.PaintPressFeedback(graphics2D);
-         */
         //如果要打开颜色和像素的选择菜单
         if (OpenMenu)
             this.PaintOpenMenu(graphics2D);
@@ -155,18 +151,12 @@ public class PAExperimentPanel extends JPanel {
         offScreenImg = this.createImage(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height+20);
         //绘制与已经缩放以适应指定矩形内的指定图像的大小
         g.drawImage(offScreenImg, 0, 0, Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height, this);
-        g.drawImage(new ImageIcon("简笔画黑白.jpg").getImage(), 0, 0, this); //调节图片位置
+
+        ImageIcon ic = new ImageIcon("简笔画.jpg");
+        g.drawImage(new ImageIcon("简笔画.jpg").getImage(), 100, ic.getIconHeight() - 150, this); //调节图片位置
+        g.drawImage(new ImageIcon("简笔画黑白.jpg").getImage(),ic.getIconWidth()*2 - 100,ic.getIconHeight() - 150,this);
         //转换
         Line = (Graphics2D) g;
-
-        //设置写字板中的测试区域
-        offScreen = (Graphics2D) g;
-        //offScreen.setColor(Color.GREEN);
-        //offScreen.fillRect(200,5,1150,100);
-        //颜色和像素区域分隔线
-        //offScreen.setColor(Color.white);
-        //offScreen.drawLine(583,5,583,105);
-        //offScreen.drawLine(966,5,966,105);
 
         //使用容器中点的信息来画线条
         for (int i = 0; i < arrayListSpot.size() ; i++) {

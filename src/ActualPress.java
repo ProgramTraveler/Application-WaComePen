@@ -52,9 +52,6 @@ public class ActualPress extends JFrame implements ActionListener, MouseInputLis
     /*
         将ActualPress分为两个区域
      */
-    private JPanel APInter = new JPanel(); //提示信息区域
-    private JPanel APDraw = new JPanel(); //画线区域
-
 
     public ActualPress() {
         paExperimentPanel.setLayout(new BorderLayout());
@@ -78,9 +75,9 @@ public class ActualPress extends JFrame implements ActionListener, MouseInputLis
     }
     public void CreateAPFrame() {
         ActualPFrame.add(paExperimentPanel);
-        //界面全屏设置
-        ImageIcon ic  = new ImageIcon("简笔画黑白.jpg");
-        ActualPFrame.setBounds(0,0, ic.getIconWidth() + 20, ic.getIconHeight() + 50);
+
+        ImageIcon ic  = new ImageIcon("简笔画.jpg"); //方便后面为界面的大小和位置做参考
+        ActualPFrame.setBounds(450,250, ic.getIconWidth()*3, ic.getIconHeight()*2); //设置界面的位置和大小
 
         ActualPFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ActualPFrame.setVisible(true);
@@ -93,10 +90,7 @@ public class ActualPress extends JFrame implements ActionListener, MouseInputLis
     }
     //重绘APInter界面
     public void RepaintAPInter() {
-        APInter.removeAll();
-        APInter.repaint();
 
-        APInter.revalidate();
     }
     //根据用户的当前的鼠标位置来计算出用户选择的是菜单中的哪块区域
     public int CheckSelectMenuItem(int x,int y) {
