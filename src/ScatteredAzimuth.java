@@ -145,7 +145,7 @@ public class ScatteredAzimuth extends JFrame implements MouseInputListener, KeyL
                     asExperimentJPanel.DefinePixel(2);
 
                 }
-                
+
                 //再一次打开像素一级菜单
                 asExperimentJPanel.SetShowPixelMenu(true);
             }
