@@ -1,5 +1,5 @@
 public class Login {
     public static void main(String[] arge) {
-        ActualPress actualPress = new ActualPress(0);
+        ActualPress actualPress = new ActualPress();
     }
 }

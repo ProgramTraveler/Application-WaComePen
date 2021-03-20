@@ -55,41 +55,8 @@ public class ActualPress extends JFrame implements ActionListener, MouseInputLis
     private JPanel APInter = new JPanel(); //提示信息区域
     private JPanel APDraw = new JPanel(); //画线区域
 
-    /*
-        提示标签和提示语句
-            当前的颜色和像素
-    */
-    //做为当前颜色的提示标签
-    private JLabel ShowColorL = new JLabel("当前颜色:");
-    //设置当前的提示颜色块（默认的初始的颜色为黑色）
-    private JPanel ShowColorBlock = new JPanel();
-    //设置当前颜色的像素标签
-    private JLabel ShowPixelL = new JLabel("当前像素:");
-    //展示像素值
-    private JLabel ShowPixel = new JLabel();
-    //像素语句，用于提示当前的像素值
-    private String StringPixel = "1.0";
-    /*
-    提示标签和语句
-        应该切换的颜色和像素
-     */
-    //切换颜色的提示
-    private JLabel ShowColorT = new JLabel("目标颜色");
-    //颜色提示块
-    private JPanel JPanelRandomC = new JPanel();
-    //切换像素显示
-    private JLabel ShowPixelT = new JLabel("目标像素");
-    //展示目标像素值
-    private JLabel JPanelRandomP = new JLabel();
-    //像素提示语句
-    private String RandomPixel = "";
 
-    //用户是否第一次进入颜色测试区域，true表示未进入
-    private boolean ColorFlag = true;
-    //判断用户是否第一次进入像素测试区域，true表示未进入
-    private boolean PixelFlag = true;
-
-    public ActualPress(int BlockNumber) {
+    public ActualPress() {
         paExperimentPanel.setLayout(new BorderLayout());
         paExperimentPanel.addMouseListener(this);
         paExperimentPanel.addMouseMotionListener(this);
@@ -131,80 +98,25 @@ public class ActualPress extends JFrame implements ActionListener, MouseInputLis
         //上半部分的界面,背景颜色为默认颜色
         APInter.setLayout(null); //不采用布局管理器,由坐标定位
 
-        //当前颜色提示标签
-        ShowColorL.setBounds(520,200,100,20);
-        ShowColorL.setFont(new Font("楷体",Font.BOLD,20));
-        APInter.add(ShowColorL);
-        //当前颜色（颜色块）
-        ShowColorBlock.setBounds(620,200,60,20);
-        ShowColorBlock.setBackground(Color.BLACK);
-        APInter.add(ShowColorBlock);
 
-        //当前像素提示标签
-        ShowPixelL.setBounds(903,200,100,20);
-        ShowPixelL.setFont(new Font("楷体",Font.BOLD,20));
-        APInter.add(ShowPixelL);
-        //当前像素
-        ShowPixel.setBounds(1003,200,100,20);
-        ShowPixel.setText(StringPixel);
-        ShowPixel.setHorizontalAlignment(ShowPixel.LEFT);
-        ShowPixel.setFont(new Font("黑体",Font.BOLD,20));
-        APInter.add(ShowPixel);
     }
     public void CreateAPDraw() {
         APDraw.setLayout(new BorderLayout());
         APDraw.setBackground(Color.WHITE);
         APDraw.add(paExperimentPanel,BorderLayout.CENTER);
     }
-    //重绘APInter界面(将提示的移除掉)
-    public void RemoveRandom() {
-        APInter.removeAll();
-        APInter.repaint();
-        //将颜色提示语句和颜色块隐藏
-        ShowColorT.setBounds(0,0,0,0);
-        JPanelRandomC.setBounds(0,0,0,0);
-        //将像素提示语句和像素值隐藏
-        ShowPixelT.setBounds(0,0,0,0);
-        JPanelRandomP.setBounds(0,0,0,0);
-        //将笔的当前的提示颜色变为黑色
-        ShowColorBlock.setBackground(Color.BLACK);
-        //将笔的当前提示像素变为1.0
-        StringPixel = "1.0";
-        ShowPixel.setText(StringPixel);
-        //当前颜色和像素的展示
-        APInter.add(ShowColorL);
-        APInter.add(ShowColorBlock);
-        APInter.add(ShowPixelL);
-        APInter.add(ShowPixel);
-        APInter.revalidate();
-        //将笔的颜色变为黑色
-        paExperimentPanel.DefineColor();
-        //将笔的像素变为1.0
-        paExperimentPanel.DefinePixel();
+    //当压力到达时弹出的选择框
+    public void ProcessTriggerSwitch() {
+        MenuFlag = true; //展开选择菜单栏
+        paExperimentPanel.SetOpenMenu(MenuFlag); //打开颜色和像素的选择菜单
+        paExperimentPanel.repaint(); //重绘
     }
     //重绘APInter界面
     public void RepaintAPInter() {
         APInter.removeAll();
         APInter.repaint();
 
-        //当前颜色和像素的展示
-        APInter.add(ShowColorL);
-        APInter.add(ShowColorBlock);
-        APInter.add(ShowPixelL);
-        APInter.add(ShowPixel);
-        //目标颜色和像素的展示
-        APInter.add(ShowColorT);
-        APInter.add(JPanelRandomC);
-        APInter.add(ShowPixelT);
-        APInter.add(JPanelRandomP);
-
         APInter.revalidate();
-    }
-    //当压力到达时弹出的选择框
-    public void ProcessTriggerSwitch() {
-        MenuFlag = true; //展开选择菜单栏
-        paExperimentPanel.SetOpenMenu(MenuFlag); //打开颜色和像素的选择菜单
-        paExperimentPanel.repaint(); //重绘
     }
     //根据用户的当前的鼠标位置来计算出用户选择的是菜单中的哪块区域
     public int CheckSelectMenuItem(int x,int y) {
@@ -287,26 +199,8 @@ public class ActualPress extends JFrame implements ActionListener, MouseInputLis
     }
     @Override
     public void keyPressed(KeyEvent e) {
-        //如果用户按下ALT键，说明要开始切换
-        /*if (e.getKeyCode() == KeyEvent.VK_ALT) {
-            ChooseFlag = true;
-        }*/
-        //当一次实验完成，用户按下回车键
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            //更新颜色和像素条件
-            ColorFlag = true;
-            PixelFlag = true;
-            //清空集合中的点的信息
-            paExperimentPanel.arrayListSpot.clear();
-            //重绘
-            paExperimentPanel.repaint();
-            //将检查是否进入颜色和像素测试区域的变量设为false
-            ColorChange = false;
-            PixelChange = false;
-            //将提示语句移除
-            this.RemoveRandom();
 
-        }
+
     }
 
     @Override
