@@ -117,34 +117,6 @@ public class PAExperimentPanel extends JPanel {
         if (OpenMenu)
             this.PaintOpenMenu(graphics2D);
     }
-    //绘制出压力动态显示界面
-    public void PaintPressFeedback(Graphics2D graphics2D) {
-        //显示压力值波动的方框
-        graphics2D.setColor(ClearWhite);
-        graphics2D.fillRect( (int)FeedbackShowPoint.getX() - PressureFeedbackWidth / 2, (int)FeedbackShowPoint.getY() - PressureFeedbackHeight,
-                PressureFeedbackWidth, PressureFeedbackHeight);
-        graphics2D.setColor(ClearLightGray);
-        graphics2D.drawRect( (int)FeedbackShowPoint.getX() - PressureFeedbackWidth / 2, (int)FeedbackShowPoint.getY() - PressureFeedbackHeight,
-                PressureFeedbackWidth, PressureFeedbackHeight);
-        //显示压力值将要到达的那个红色区域
-        double TargetHeight = PressureFeedbackHeight * ( ( (double)MaxPressure - (double)TriggerPressureSwitch) / (double)MaxPressure);
-        graphics2D.setColor(ClearRed);
-        graphics2D.fillRect( (int)FeedbackShowPoint.getX() - PressureFeedbackWidth / 2, (int)FeedbackShowPoint.getY() - PressureFeedbackHeight,
-                PressureFeedbackWidth, (int)TargetHeight );
-
-        graphics2D.setColor( ClearLightGray);
-        graphics2D.drawRect( (int)FeedbackShowPoint.getX() - PressureFeedbackWidth / 2, (int)FeedbackShowPoint.getY() - PressureFeedbackHeight,
-                PressureFeedbackWidth, (int)TargetHeight );
-        //黑点上升的那条直线
-        graphics2D.drawLine( (int)FeedbackShowPoint.getX(), (int)FeedbackShowPoint.getY() - PressureFeedbackHeight,
-                (int)FeedbackShowPoint.getX(), (int)FeedbackShowPoint.getY() );
-        //动态变化的黑点
-        if ( CurrentPress >= 0 ) {
-            graphics2D.setColor( ClearBlack);
-            double RatioY = FeedbackShowPoint.getY() - PressureFeedbackHeight * ( (double)CurrentPress / (double)MaxPressure);
-            graphics2D.fillArc( (int)FeedbackShowPoint.getX() - PressureCursorRadius, (int)RatioY - PressureCursorRadius, PressureCursorRadius * 2, PressureCursorRadius * 2, 0, 360 );
-        }
-    }
     //绘制出菜单界面
     public void PaintOpenMenu(Graphics2D graphics2D) {
         //画出颜色和像素两个菜单
@@ -183,18 +155,18 @@ public class PAExperimentPanel extends JPanel {
         offScreenImg = this.createImage(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height+20);
         //绘制与已经缩放以适应指定矩形内的指定图像的大小
         g.drawImage(offScreenImg, 0, 0, Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height, this);
-
+        g.drawImage(new ImageIcon("简笔画黑白.jpg").getImage(), 0, 0, this); //调节图片位置
         //转换
         Line = (Graphics2D) g;
 
         //设置写字板中的测试区域
         offScreen = (Graphics2D) g;
-        offScreen.setColor(Color.GREEN);
-        offScreen.fillRect(200,5,1150,100);
+        //offScreen.setColor(Color.GREEN);
+        //offScreen.fillRect(200,5,1150,100);
         //颜色和像素区域分隔线
-        offScreen.setColor(Color.white);
-        offScreen.drawLine(583,5,583,105);
-        offScreen.drawLine(966,5,966,105);
+        //offScreen.setColor(Color.white);
+        //offScreen.drawLine(583,5,583,105);
+        //offScreen.drawLine(966,5,966,105);
 
         //使用容器中点的信息来画线条
         for (int i = 0; i < arrayListSpot.size() ; i++) {
@@ -256,14 +228,6 @@ public class PAExperimentPanel extends JPanel {
             graphics2D.setColor(MenuLineColor);
             graphics2D.drawRect(MenuX + MenuWidth,MenuY + (MenuItemHeight * i),MenuItemWidth,MenuItemHeight);
         }
-        //设置所有颜色标签的位置
-        /*ColorBlue.setBounds(MenuX + MenuWidth - MenuItemWidth + 5,MenuY ,MenuItemWidth,MenuItemHeight);
-        ColorRed.setBounds(MenuX - MenuWidth - MenuItemWidth  + 5,MenuY + MenuItemHeight,MenuItemWidth,MenuItemHeight);
-        ColorYellow.setBounds(MenuX - MenuWidth - MenuItemWidth  + 5,MenuY + MenuItemHeight * 2,MenuItemWidth,MenuItemHeight);
-        //将所有颜色标签添加到组件
-        this.add(ColorBlue);
-        this.add(ColorRed);
-        this.add(ColorYellow);*/
         //设置红色颜色块的位置
         graphics2D.setColor(Color.BLUE);
         graphics2D.fillRect(MenuX + MenuWidth, MenuY, MenuItemWidth, MenuItemHeight);
@@ -286,7 +250,6 @@ public class PAExperimentPanel extends JPanel {
             graphics2D.drawRect(MenuX + MenuWidth,MenuY + MenuItemHeight * SelectColorItem,MenuItemWidth,MenuItemHeight);
             SetColor = SelectColorItem + 1; //只有进行有效的切换时才保留颜色值
         }
-        //System.out.println("Color:" + SetColor);
     }
     //绘制出像素选择栏，分别为2.0，3.0和4.0
     public void PaintPixelMenuItem(Graphics2D graphics2D) {
@@ -313,6 +276,5 @@ public class PAExperimentPanel extends JPanel {
             graphics2D.drawRect(MenuX + MenuWidth,MenuY + MenuItemHeight * (SelectPixelItem + 1),MenuItemWidth,MenuItemHeight);
             SetPixel = SelectPixelItem + 2; //只有进行有效的切换时，才保留像素值
         }
-        //System.out.println("SetPixel:" + SetPixel);
     }
 }

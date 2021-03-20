@@ -77,33 +77,13 @@ public class ActualPress extends JFrame implements ActionListener, MouseInputLis
         timer.stop();
     }
     public void CreateAPFrame() {
-        this.CreateAPInter();
-        this.CreateAPDraw();
-        /*
-        将界面分割为两部分
-         */
-        JSplitPane jSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,false,APInter,APDraw); //这里第一个参数是控制分割线竖直，第二个参数是当你拖曳切割面版的分隔线时，窗口内的组件是否会随着分隔线的拖曳而动态改变大小，最后两个参数就是我分割完成后分割线两边各添加哪个容器。
-        jSplitPane.setDividerLocation(300); //分割线的位置  也就是初始位置
-        jSplitPane.setOneTouchExpandable(false); //是否可展开或收起，在这里没用
-        jSplitPane.setDividerSize(0);//设置分割线的宽度 像素为单位(这里设为0，择时不显示分割线)
-        jSplitPane.setEnabled(false); //设置分割线不可拖动！！
-        ActualPFrame.add(jSplitPane);  //加入到面板中就好了
-
+        ActualPFrame.add(paExperimentPanel);
         //界面全屏设置
-        ActualPFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        ImageIcon ic  = new ImageIcon("简笔画黑白.jpg");
+        ActualPFrame.setBounds(0,0, ic.getIconWidth() + 20, ic.getIconHeight() + 50);
+
         ActualPFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ActualPFrame.setVisible(true);
-    }
-    public void CreateAPInter() {
-        //上半部分的界面,背景颜色为默认颜色
-        APInter.setLayout(null); //不采用布局管理器,由坐标定位
-
-
-    }
-    public void CreateAPDraw() {
-        APDraw.setLayout(new BorderLayout());
-        APDraw.setBackground(Color.WHITE);
-        APDraw.add(paExperimentPanel,BorderLayout.CENTER);
     }
     //当压力到达时弹出的选择框
     public void ProcessTriggerSwitch() {
