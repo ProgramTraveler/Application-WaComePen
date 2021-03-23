@@ -111,17 +111,15 @@ public class SelectMode extends JFrame implements ActionListener {
         if(getSelection(ButtonFrame).getActionCommand() == "Painting") {
             ActualPress actualPress = new ActualPress();
         }else if (getSelection(ButtonFrame).getActionCommand() == "Copy&Paste") {
-
+            aCopy aCopy = new aCopy();
         }else if (getSelection(ButtonFrame).getActionCommand() == "Enlarge&Lessen") {
-
+            aEnlarge aEnlarge = new aEnlarge();
         }else if (getSelection(ButtonFrame).getActionCommand() == "painting") {
             ScatteredAzimuth scatteredAzimuth = new ScatteredAzimuth();
         }else if (getSelection(ButtonFrame).getActionCommand() == "copy&paste") {
-
+            sCopy sCopy = new sCopy();
         }else if (getSelection(ButtonFrame).getActionCommand() == "enlarge&lessen") {
-
-        }else if (getSelection(ButtonFrame).getActionCommand() == "A-离散值") {
-
+            sEnlarge sEnlarge = new sEnlarge();
         }
 
 
