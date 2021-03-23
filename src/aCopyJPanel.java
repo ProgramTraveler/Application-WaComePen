@@ -43,9 +43,9 @@ public class aCopyJPanel extends JPanel {
     private Image offScreenImg = null;
     private int ColorSet = 0; //设置画笔的复制
     private int PixelSet = 1; //设置画笔的复制
-    //复制和粘贴标签，用来提示菜单内容
+    //复制和复制标签，用来提示菜单内容
     private JLabel ColorJLabel = new JLabel("复制"); //复制标签
-    private JLabel PixelJLabel = new JLabel("粘贴"); //复制标签
+    private JLabel PixelJLabel = new JLabel("复制"); //复制标签
     //在复制菜单和复制菜单的基础上还能选择的分支菜单
 
     private boolean ShowColorMenu = false; //是否显示复制分支菜单
@@ -77,19 +77,19 @@ public class aCopyJPanel extends JPanel {
     public void SetSelectMenuItem(int n) { SelectMenuItem = n; }
     //设置是否显示复制分支菜单
     public void SetShowColorMenu(boolean b) { ShowColorMenu = b; }
-    //设置是否显示粘贴分支菜单
+    //设置是否显示复制分支菜单
     public void SetShowPixelMenu(boolean b) { ShowPixelMenu = b; }
     //图像的重绘界面
     public void paintComponent(Graphics g) {
         Graphics2D graphics2D = (Graphics2D) g;
         this.PaintTestArea(g); //绘画出测试区域
-        //如果要打开复制和粘贴的选择菜单
+        //如果要打开复制和复制的选择菜单
         if (OpenMenu)
             this.PaintOpenMenu(graphics2D);
     }
     //绘制出菜单界面
     public void PaintOpenMenu(Graphics2D graphics2D) {
-        //画出复制和粘贴两个菜单
+        //画出复制和复制两个菜单
         for (int i =0; i < NumberOfMenu; i ++) {
             graphics2D.setColor(MenuItemColor);
             graphics2D.fillRect(MenuX,MenuY + (MenuHeight * i),MenuWidth,MenuHeight);
@@ -99,9 +99,9 @@ public class aCopyJPanel extends JPanel {
         //设置复制提示标签位置
         ColorJLabel.setBounds(MenuX + 5,MenuY,MenuWidth,MenuHeight);
         this.add(ColorJLabel); //将标签添加到组件中
-        //设置粘贴提示标签位置
+        //设置复制提示标签位置
         PixelJLabel.setBounds(MenuX + 5,MenuY + MenuHeight,MenuWidth,MenuHeight);
-        this.add(PixelJLabel); //将粘贴提示标签添加到组件中
+        this.add(PixelJLabel); //将复制提示标签添加到组件中
         //根据选择的菜单框中的位置来给出相应的反馈
         if (SelectMenuItem >= 0) {
             graphics2D.setColor(SelectMenuItemColor);
@@ -112,7 +112,7 @@ public class aCopyJPanel extends JPanel {
         //如果是在复制区域，则打开复制的分支菜单
         if (ShowColorMenu)
             indexF = true; //表示对复制菜单进行了选择
-        //如果是在粘贴区域，则打开粘贴的分支菜单
+        //如果是在复制区域，则打开复制的分支菜单
         if (ShowPixelMenu)
             indexZ = true;
         graphics2D.setColor(MenuLineColor);
@@ -137,12 +137,12 @@ public class aCopyJPanel extends JPanel {
         }
 
     }
-    //当抬笔时，清除所有复制和粘贴标签
+    //当抬笔时，清除所有复制和复制标签
     public void RemoveAllJLabel() {
         this.removeAll();
         this.repaint();
     }
-    //当笔在移动过程中，对分支复制和粘贴进行移除和重组
+    //当笔在移动过程中，对分支复制和复制进行移除和重组
     public void RemoveItemJLabel() {
 
         this.repaint();

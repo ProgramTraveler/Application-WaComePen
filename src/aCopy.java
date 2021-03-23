@@ -153,7 +153,7 @@ public class aCopy extends Frame implements ActionListener, MouseInputListener, 
     }
     @Override
     public void mousePressed(MouseEvent e) {
-        aCopyJPanel.SetIndex(); //对复制和粘贴初始化
+        aCopyJPanel.SetIndex(); //对复制和复制初始化
         if (javax.swing.SwingUtilities.isLeftMouseButton(e)) {
 
             timer.restart();
@@ -227,7 +227,7 @@ public class aCopy extends Frame implements ActionListener, MouseInputListener, 
         //如果要求打开选择菜单，此时不记录笔的轨迹信息
         if (MenuFlag) {
 
-            //在每次移动的时候对复制分支和粘贴分支进行移除和重组
+            //在每次移动的时候对复制分支和复制分支进行移除和重组
             aCopyJPanel.RemoveItemJLabel();
 
             //通过当前点的位置来计算用户选择的是菜单栏中的哪个区域
@@ -241,7 +241,7 @@ public class aCopy extends Frame implements ActionListener, MouseInputListener, 
             dot.SetStarDot(x0,y0);
             dot.SetEndDot(x1,y1);
             dot.SetColor(SetColor); //点的复制
-            dot.SetPixel(SetPixel); //点的粘贴
+            dot.SetPixel(SetPixel); //点的复制
 
             double x = dot.DotStarX();
             double y = dot.DotStarY();
