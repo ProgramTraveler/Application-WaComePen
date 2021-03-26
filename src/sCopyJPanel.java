@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
@@ -9,9 +11,18 @@ import java.util.ArrayList;
     purpose:对方位角离散化界面的复制和复制界面的拓展
  */
 public class sCopyJPanel extends JPanel {
-    private int CurrentAzimuth = -1; //当前方位角的值
+    private int CurrentTilt = -1; //记录当前的倾斜角的值
 
-    private int PartitionLineLength = 45; //设置圆形的覆盖区域（分隔线长度）
+    private int PenHeight = 70; //提示笔的长度
+    private int PenWidth = 1; //提示笔的宽度
+    private int PenLineWidth = 2;
+    private int PenTip = 3;
+    private int AngleFeedBackRadius = PenHeight + 5;
+    private int MinAngle = 22; //最小角度
+    private int MaxAngle = 90; //最大角度
+
+    private int TriggerAngleSwitch_1 = 54;
+    private int TriggerAngleSwitch_2 = 71;
 
     private int  permeationRate = 180;
     private Color ClearWhite = new Color( Color.white.getRed(), Color.white.getGreen(), Color.white.getBlue(), permeationRate);
@@ -21,41 +32,49 @@ public class sCopyJPanel extends JPanel {
     private Color ClearPink = new Color( Color.pink.getRed(), Color.pink.getGreen(), Color.pink.getBlue(), permeationRate);
     private Color ClearGray = new Color( Color.gray.getRed(), Color.gray.getGreen(), Color.gray.getBlue(), permeationRate);
 
-    private Point FeedbackShowPoint = new Point(); //记录点的位置，为后面的压力提示，复制和粘贴菜单切换提供位置基础
+
+    private Point FeedbackShowPoint = new Point(); //记录点的位置，为后面的压力提示，颜色和像素菜单切换提供位置基础
+
     public static ArrayList<Dot> arrayListSpot; //记录点在绘画过程中的信息,为了方便可以直接调用，就写成了public的
-    private Graphics2D Line; //设置线条的相关信息
-    private Graphics2D offScreen; //显示测试区域
     //抽象类Image是表示图形图像的所有类的超类，必须以平台特定的方式获取图像
     private Image offScreenImg = null;
-    private int ColorSet = 0; //设置画笔的复制
-    private int PixelSet = 1; //设置画笔的粘贴
-    //复制和粘贴标签，用来提示菜单内容
+
+
     private JLabel ColorJLabel = new JLabel("复制"); //复制标签
     private JLabel PixelJLabel = new JLabel("粘贴"); //粘贴标签
 
     private boolean ShowBack = false; //用来控制是否显示压力的动态图像,默认为不打开
 
-    private boolean ShowColorMenu = true; //是否显示复制菜单
+    private boolean ShowColorMenu = true; //是否显示复制分支菜单
 
-    private boolean ShowPixelMenu = true; //是否显示像支菜单
+    private boolean ShowPixelMenu = true; //是否显示粘贴分支菜单
 
+    private boolean indexF = false;
+    private boolean indexZ = false;
 
-    private int SetColor = 0; //记录被选择的复制
-    private int SetPixel = 1; //记录被选择的粘贴
+    public void SetIndexF(boolean b) {
+        indexF = b;
+    }
+
+    public void SetIndexZ(boolean b) {
+        indexZ = b;
+    }
+    public boolean GetIndexZ() {
+        return indexZ;
+    }
+    public void SetIndex() {
+        indexF = false;
+        indexZ = false;
+    }
 
     public sCopyJPanel() { arrayListSpot = new ArrayList<Dot>(); }
-    //传入笔的方位角
-    public void SetCurrentAzimuth(int c) { this.CurrentAzimuth = c; }
-    //用来选择是否显示压力的动态图像
-    public void SetShowBack(boolean b) { ShowBack = b; }
+    //传入的笔尖倾斜角值
+    public void SetCurrentTilt(int c) { this.CurrentTilt = c; }
     //传入当前点的坐标
     public void SetShowPoint(Point p) { this.FeedbackShowPoint = p; }
-    //返回用户选择的复制（是对应菜单中的复制）
-    public void DefineColor(int i) { SetColor = i; } //初始化复制
-    public int GetSetColor() { return SetColor; }
-    //放回用户选择的粘贴（是对应菜单中的粘贴）
-    public void DefinePixel(int i) { SetPixel = i; } //初始化粘贴
-    public int GetSetPixel() { return SetPixel; }
+    //用来选择是否显示倾斜角的动态图像
+    public void SetShowBack(boolean b) { ShowBack = b; }
+
     //控制是打开复制一级菜单还是二级菜单,true表示是一级菜单，false表示是二级菜单
     public void SetShowColorMenu(boolean b) { ShowColorMenu = b; }
     public boolean GetShowColorMenu() { return ShowColorMenu; } //返回复制菜单状态
@@ -66,91 +85,118 @@ public class sCopyJPanel extends JPanel {
     public void paintComponent(Graphics g) {
         Graphics2D graphics2D = (Graphics2D) g;
         this.PaintTestArea(g); //绘制出测试区域
-        //显示动态方位角菜单
+        //显示动态倾斜角菜单
         if (ShowBack)
-            this.PaintAzimuthFeedback(graphics2D);
+            this.PaintTiltFeedback(graphics2D);
     }
-    //绘制压力动态显示界面
-    public void PaintAzimuthFeedback(Graphics2D graphics2D) {
-        graphics2D.setColor(Color.WHITE); //设置测试背景为红色
-        //设置圆形方位角展示区域出现的位置，红色覆盖的角度为0-360
-        graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,0,360);
-        //设置弧线复制
-        graphics2D.setColor(Color.GRAY);
-        //将弧线标黑(整个圆形区域的弧线)
-        graphics2D.drawArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,0,360);
-        //设置复制和粘贴一级菜单的分界线
-        graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 154 + 90,4);
-        graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 109 + 90,4);
-        graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 311 + 90,4);
-        graphics2D.setPaint(ClearWhite); //设置用户常用区域显示为白色
-        //设置圆形方位角展示区域出现的位置，白色覆盖区域为109-154
-        graphics2D.fillArc(FeedbackShowPoint.x - PartitionLineLength,FeedbackShowPoint.y - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 109 + 90,- 45); //88-176为常用的区域，所以用白色表示
-        //显示复制一级菜单
+    //绘制倾斜角动态显示界面
+    public void PaintTiltFeedback(Graphics2D graphics2D) {
+        graphics2D.setColor(ClearWhite);
+        graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius,(int)FeedbackShowPoint.getY() - AngleFeedBackRadius,AngleFeedBackRadius * 2,AngleFeedBackRadius * 2, MinAngle,MaxAngle - MinAngle);
+        graphics2D.setColor(ClearBlack); //角度线和边界线的复制
+        //整个角度的弧线
+        graphics2D.drawArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius * 2, 22, 68);
+        //上半部分边界线
+        graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius * 2, 90,-1);
+        //下半部分边界线
+        graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius * 2, 22,1);
+        //显示复制标签
         if (ShowColorMenu && ShowPixelMenu) {
-            ColorJLabel.setBounds((int)FeedbackShowPoint.getX() - PartitionLineLength + 40,(int)FeedbackShowPoint.getY() - PartitionLineLength - 20,PartitionLineLength * 2,PartitionLineLength * 2);
-            this.add(ColorJLabel);
+            graphics2D.setColor(ClearBlack); //设置分隔线的复制
+            //上半部分的扇形区域，由于没有直接画扇形的，所以就进行小角度的复制填充
+            graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius * 2, 80,2);
+            //下半部分的扇形区域
+            graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius * 2, 54,2);
+            if (CurrentTilt >=80 && CurrentTilt <= 90) {
+                ColorJLabel.setBounds((int)FeedbackShowPoint.getX(),(int)FeedbackShowPoint.getY() - AngleFeedBackRadius - 50, AngleFeedBackRadius, AngleFeedBackRadius);
+                this.add(ColorJLabel);
+            }
+            if (CurrentTilt <= 54 && CurrentTilt >= 38){
+                ColorJLabel.setBounds((int)FeedbackShowPoint.getX() + AngleFeedBackRadius,(int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius, AngleFeedBackRadius);
+                this.add(ColorJLabel);
+            }
         }else if (ShowColorMenu == false) {
-            //展开复制二级菜单
-            this.remove(ColorJLabel);
-            this.remove(PixelJLabel);
-
-            graphics2D.setColor(Color.BLUE);
-            graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 109 + 90, 52);
-
-            graphics2D.setColor(Color.ORANGE);
-            graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 57 + 90,52);
-
-            graphics2D.setColor(Color.RED);
-            graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 5 + 90,54);
-        }
-        //显示粘贴一级菜单
-        if (ShowColorMenu && ShowPixelMenu) {
-            PixelJLabel.setBounds((int)FeedbackShowPoint.getX() - PartitionLineLength + 10,(int)FeedbackShowPoint.getY() - PartitionLineLength + 10,PartitionLineLength * 2,PartitionLineLength * 2);
-            this.add(PixelJLabel);
-        }else if (ShowPixelMenu == false) {
-            //展开粘贴二级菜单
             remove(ColorJLabel);
             remove(PixelJLabel);
 
-            graphics2D.setColor(ClearBlack); //设置分隔线颜色
+        }
+        //显示粘贴标签
+        if (ShowPixelMenu && ShowColorMenu) {
+            graphics2D.setColor(ClearBlack); //设置分界线复制
+            //上半部分的扇形区域
+            graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius * 2, 71,2);
+            //下半部分的复制区域
+            graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 38, 2);
+            if (CurrentTilt >= 71 && CurrentTilt < 80) {
+                PixelJLabel.setBounds((int)FeedbackShowPoint.getX(),(int)FeedbackShowPoint.getY() - AngleFeedBackRadius - 50, AngleFeedBackRadius, AngleFeedBackRadius);
+                this.add(PixelJLabel);
+            }
+            if (CurrentTilt >= 22 && CurrentTilt < 38) {
+                PixelJLabel.setBounds((int)FeedbackShowPoint.getX() + AngleFeedBackRadius,(int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius, AngleFeedBackRadius);
+                this.add(PixelJLabel);
+            }
+
+        }else if (ShowPixelMenu == false) {
+            remove(ColorJLabel);
+            remove(PixelJLabel);
+
 
         }
-        //显示颜色的选择
+        //显示复制和粘贴菜单的选择框
         graphics2D.setColor(ClearLightGray);
-        if (ShowColorMenu == false) {
-            if (CurrentAzimuth <= 109 && CurrentAzimuth > 57) {
-                graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 109 + 90, 52);
-            }
-            if (CurrentAzimuth <= 57 && CurrentAzimuth > 5) {
-                graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 57 + 90,52);
-            }
-            if ((CurrentAzimuth <= 5 && CurrentAzimuth > 0) || (CurrentAzimuth >= 311 && CurrentAzimuth <= 360)) {
-                graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 5 + 90,54);
-            }
-        }else if ((CurrentAzimuth >= 311 && CurrentAzimuth <= 360) || (CurrentAzimuth <= 109 && CurrentAzimuth >= 0)) {
-            graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 109 + 90, 158);
-        }
-        //显示粘贴选择
         if (ShowPixelMenu == false) {
-            if (CurrentAzimuth >= 154 && CurrentAzimuth < 206) {
-                graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 154 + 90,-52);
+            if (CurrentTilt >= 66 && CurrentTilt <= 90) {
+                graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 66, 24);
             }
-            if (CurrentAzimuth >= 206 && CurrentAzimuth < 258) {
-                graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 206 + 90,-52);
+            if (CurrentTilt >= 44 && CurrentTilt < 66) {
+                graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 44, 22);
             }
-            if (CurrentAzimuth >= 258 && CurrentAzimuth < 311) {
-                graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 258 + 90,-53);
+            if (CurrentTilt >= 22 && CurrentTilt < 44) {
+                graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 22, 22);
             }
-        }else if (CurrentAzimuth >= 154 && CurrentAzimuth < 311) {
-            graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - 154 + 90, -157);
-        }
-        //箭头的显示控制
-        if (CurrentAzimuth > 109 && CurrentAzimuth < 154 && ShowColorMenu && ShowPixelMenu) {
-            graphics2D.setColor(Color.BLACK);
-            graphics2D.fillArc((int)FeedbackShowPoint.getX() - PartitionLineLength,(int)FeedbackShowPoint.getY() - PartitionLineLength,PartitionLineLength * 2,PartitionLineLength * 2,360 - CurrentAzimuth + 90, 5);
+        }else if (CurrentTilt >= 71 && CurrentTilt < 80 && ShowPixelMenu && ShowColorMenu) {
+            graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 71, 9);
+        }else if (CurrentTilt >=22 && CurrentTilt < 38 && ShowPixelMenu && ShowColorMenu) {
+            graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 22, 16);
         }
 
+        if (ShowColorMenu == false) {
+            if (CurrentTilt >= 66 && CurrentTilt <= 90) {
+                graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 66, 24);
+            }
+            if (CurrentTilt >= 44 && CurrentTilt < 66) {
+                graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 44, 22);
+            }
+            if (CurrentTilt >= 22 && CurrentTilt < 44) {
+                graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 22, 22);
+            }
+        }else if (CurrentTilt >= 80 && CurrentTilt <=90 && ShowColorMenu && ShowPixelMenu) {
+            graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 80, 10);
+        }else if (CurrentTilt >=38 && CurrentTilt <=54 && ShowColorMenu && ShowPixelMenu) {
+            graphics2D.fillArc((int)FeedbackShowPoint.getX() - AngleFeedBackRadius, (int)FeedbackShowPoint.getY() - AngleFeedBackRadius, AngleFeedBackRadius * 2, AngleFeedBackRadius *2, 38, 16);
+        }
+
+        //当在菜单范围外，而且时一级菜单展示，那么就显示箭头
+        if (CurrentTilt > 54 && CurrentTilt < 71 && ShowColorMenu && ShowPixelMenu) {
+            AffineTransform affineTransform = new AffineTransform(); //构造一个新的 AffineTransform代表身份转换
+            affineTransform.setToRotation(Math.toRadians(360 - CurrentTilt),FeedbackShowPoint.getX(),FeedbackShowPoint.getY());
+            graphics2D.transform(affineTransform); //将此转换设置为转换的旋转变换
+
+            BasicStroke basicStroke = new BasicStroke(PenLineWidth); //构造一个固定的 BasicStroke具有指定的线宽，并使用上限和连接样式的默认值
+            graphics2D.setStroke(basicStroke);
+
+            GeneralPath generalPath = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+            generalPath.moveTo( (int)FeedbackShowPoint.getX() + PenLineWidth, (int)FeedbackShowPoint.getY() );
+            generalPath.lineTo( (int)FeedbackShowPoint.getX() + PenTip + PenLineWidth, (int)FeedbackShowPoint.getY() - PenWidth);
+            generalPath.lineTo( (int)FeedbackShowPoint.getX() + PenHeight + PenLineWidth, (int)FeedbackShowPoint.getY() - PenWidth);
+            generalPath.lineTo( (int)FeedbackShowPoint.getX() + PenLineWidth, (int)FeedbackShowPoint.getY());
+            generalPath.closePath();
+
+            graphics2D.setPaint(ClearPink);
+            graphics2D.fill(generalPath);
+            graphics2D.setPaint(ClearGray);
+            graphics2D.draw(generalPath);
+        }
     }
     public void PaintTestArea(Graphics g) {
         /*
@@ -160,21 +206,26 @@ public class sCopyJPanel extends JPanel {
         offScreenImg = this.createImage(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height+20);
         //绘制与已经缩放以适应指定矩形内的指定图像的大小
         g.drawImage(offScreenImg, 0, 0, Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height, this);
-        ImageIcon ic = new ImageIcon("简笔画.jpg");
-        g.drawImage(new ImageIcon("简笔画.jpg").getImage(), 100, ic.getIconHeight() - 150, this); //调节图片位置
-        //g.drawImage(new ImageIcon("简笔画黑白.jpg").getImage(),ic.getIconWidth()*2 - 100,ic.getIconHeight() - 150,this);
 
+        ImageIcon ic = new ImageIcon("简笔画.jpg");
+        g.drawImage(new ImageIcon("简笔画.jpg").getImage(), 100, ic.getIconHeight() - 150, this);
+
+        if (indexF && indexZ) {
+            g.drawImage(new ImageIcon("简笔画.jpg").getImage(), (int)FeedbackShowPoint.getX(),(int)FeedbackShowPoint.getY(), this); //调节图片位置
+        }
 
     }
-    //当抬笔时，清除所有颜色和粘贴标签
+    //当抬笔时，清除所有复制和粘贴标签
     public void RemoveAllJLabel() {
         this.removeAll();
         this.repaint();
     }
-    //当笔在移动过程中，对分支颜色和粘贴进行移除和重组
+    //当笔在移动过程中，对分支复制和粘贴进行移除和重组
     public void RemoveItemJLabel() {
         //移除所有的粘贴组件
 
+
         this.repaint();
     }
+
 }

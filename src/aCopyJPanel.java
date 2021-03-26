@@ -43,28 +43,28 @@ public class aCopyJPanel extends JPanel {
     private Image offScreenImg = null;
     private int ColorSet = 0; //设置画笔的复制
     private int PixelSet = 1; //设置画笔的复制
-    //复制和复制标签，用来提示菜单内容
-    private JLabel ColorJLabel = new JLabel("复制"); //复制标签
-    private JLabel PixelJLabel = new JLabel("复制"); //复制标签
-    //在复制菜单和复制菜单的基础上还能选择的分支菜单
+    //标签，用来提示菜单内容
+    private JLabel ColorJLabel = new JLabel("复制"); //标签
+    private JLabel PixelJLabel = new JLabel("粘贴"); //标签
+    //在菜单的基础上还能选择的分支菜单
 
-    private boolean ShowColorMenu = false; //是否显示复制分支菜单
+    private boolean ShowColorMenu = false; //是否显示分支菜单
 
 
-    private boolean ShowPixelMenu = false; //是否显示复制分支菜单
+    private boolean ShowPixelMenu = false; //是否显示分支菜单
 
 
 
 
     public aCopyJPanel() { arrayListSpot = new ArrayList<Dot>(); }
 
-    //用来控制复制和复制选择菜单是否展开
+
     public void SetOpenMenu(boolean b) { this.OpenMenu = b; }
     //传入的笔尖压力值
     public void SetCurrentPress(int c) { this.CurrentPress = c; }
     //传入当前点的坐标
     public void SetShowPoint(Point p) { this.FeedbackShowPoint = p; }
-    //设置MenuX和MenuY的值，就是管理复制和选择菜单的弹出位置
+    //设置MenuX和MenuY的值
     public void SetMenuX_Y(int x, int y) {
         this.MenuX = x;
         this.MenuY = y;
@@ -75,33 +75,33 @@ public class aCopyJPanel extends JPanel {
     }
     //用来提供菜单中用户选择的是哪个框
     public void SetSelectMenuItem(int n) { SelectMenuItem = n; }
-    //设置是否显示复制分支菜单
+
     public void SetShowColorMenu(boolean b) { ShowColorMenu = b; }
-    //设置是否显示复制分支菜单
+
     public void SetShowPixelMenu(boolean b) { ShowPixelMenu = b; }
     //图像的重绘界面
     public void paintComponent(Graphics g) {
         Graphics2D graphics2D = (Graphics2D) g;
         this.PaintTestArea(g); //绘画出测试区域
-        //如果要打开复制和复制的选择菜单
+        //如果要打开选择菜单
         if (OpenMenu)
             this.PaintOpenMenu(graphics2D);
     }
     //绘制出菜单界面
     public void PaintOpenMenu(Graphics2D graphics2D) {
-        //画出复制和复制两个菜单
+        //画出菜单
         for (int i =0; i < NumberOfMenu; i ++) {
             graphics2D.setColor(MenuItemColor);
             graphics2D.fillRect(MenuX,MenuY + (MenuHeight * i),MenuWidth,MenuHeight);
             graphics2D.setColor(MenuLineColor);
             graphics2D.drawRect(MenuX,MenuY + (MenuHeight * i),MenuWidth,MenuHeight);
         }
-        //设置复制提示标签位置
+        //设置提示标签位置
         ColorJLabel.setBounds(MenuX + 5,MenuY,MenuWidth,MenuHeight);
         this.add(ColorJLabel); //将标签添加到组件中
-        //设置复制提示标签位置
+        //设置提示标签位置
         PixelJLabel.setBounds(MenuX + 5,MenuY + MenuHeight,MenuWidth,MenuHeight);
-        this.add(PixelJLabel); //将复制提示标签添加到组件中
+        this.add(PixelJLabel); //将提示标签添加到组件中
         //根据选择的菜单框中的位置来给出相应的反馈
         if (SelectMenuItem >= 0) {
             graphics2D.setColor(SelectMenuItemColor);
@@ -109,10 +109,10 @@ public class aCopyJPanel extends JPanel {
             graphics2D.setColor(MenuLineColor);
             graphics2D.drawRect(MenuX,MenuY + (MenuHeight * SelectMenuItem),MenuWidth,MenuHeight);
         }
-        //如果是在复制区域，则打开复制的分支菜单
+        //打开分支菜单
         if (ShowColorMenu)
             indexF = true; //表示对复制菜单进行了选择
-        //如果是在复制区域，则打开复制的分支菜单
+        //打开分支菜单
         if (ShowPixelMenu)
             indexZ = true;
         graphics2D.setColor(MenuLineColor);

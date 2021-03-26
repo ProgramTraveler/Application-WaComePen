@@ -24,14 +24,14 @@ public class ASExperimentJPanel extends JPanel {
     private Color ClearPink = new Color( Color.pink.getRed(), Color.pink.getGreen(), Color.pink.getBlue(), permeationRate);
     private Color ClearGray = new Color( Color.gray.getRed(), Color.gray.getGreen(), Color.gray.getBlue(), permeationRate);
 
-    private Point FeedbackShowPoint = new Point(); //记录点的位置，为后面的压力提示，颜色和像素菜单切换提供位置基础
+    private Point FeedbackShowPoint = new Point(); //记录点的位置，为后面的压力提示，颜色和粘贴菜单切换提供位置基础
     public static ArrayList<Dot> arrayListSpot; //记录点在绘画过程中的信息,为了方便可以直接调用，就写成了public的
     private Graphics2D Line; //设置线条的相关信息
     private Graphics2D offScreen; //显示测试区域
     //抽象类Image是表示图形图像的所有类的超类，必须以平台特定的方式获取图像
     private Image offScreenImg = null;
     private int ColorSet = 0; //设置画笔的颜色
-    private int PixelSet = 1; //设置画笔的像素
+    private int PixelSet = 1; //设置画笔的粘贴
     //颜色和像素标签，用来提示菜单内容
     private JLabel ColorJLabel = new JLabel("颜色"); //颜色标签
     private JLabel PixelJLabel = new JLabel("像素"); //像素标签

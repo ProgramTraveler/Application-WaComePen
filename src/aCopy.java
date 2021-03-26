@@ -19,10 +19,6 @@ public class aCopy extends Frame implements ActionListener, MouseInputListener, 
     private int CurrentPress = -1; //获取当前的压力值
     private int TriggerPress = 876; //预设的压力值，当比这个值大的时候就会触发选择菜单
     //private int TriggerPress = -1; //预设的压力值，当比这个值大的时候就会触发选择菜单
-    //下面这个两个boolean的值是用来检测复制和复制切换是否合法
-    private boolean ColorChange = false; //在进入到复制的测试区域后，变为true
-    private boolean PixelChange = false; //在进入到复制的测试区域后，变为true
-
     private boolean MenuFlag = false; //是否展开选择菜单
     private boolean MenuMove = true; //是否菜单的弹出位置随着鼠标位置改变
     private int NumberOfMenuItem = 2; //一个有2个可以选择的菜单栏,分别是复制和复制
@@ -85,10 +81,7 @@ public class aCopy extends Frame implements ActionListener, MouseInputListener, 
         aCopyJPanel.SetOpenMenu(MenuFlag); //打开复制和复制的选择菜单
         aCopyJPanel.repaint(); //重绘
     }
-    //重绘APInter界面
-    public void RepaintAPInter() {
 
-    }
     //根据用户的当前的鼠标位置来计算出用户选择的是菜单中的哪块区域
     public int CheckSelectMenuItem(int x,int y) {
         int MenuItem = -1;
@@ -243,8 +236,6 @@ public class aCopy extends Frame implements ActionListener, MouseInputListener, 
             dot.SetColor(SetColor); //点的复制
             dot.SetPixel(SetPixel); //点的复制
 
-            double x = dot.DotStarX();
-            double y = dot.DotStarY();
 
 
             //将点的信息记录在容器中
